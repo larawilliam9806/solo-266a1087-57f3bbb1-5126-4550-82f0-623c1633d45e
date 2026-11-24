@@ -1,0 +1,21 @@
+services:
+  api:
+    build: .
+    image: port-table-replacement:latest
+    container_name: port-table-replacement
+    ports:
+      - "8000:8000"
+    environment:
+      DB_PATH: /data/port_tables.db
+    volumes:
+      - port_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health').status==200 else 1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  port_data:
